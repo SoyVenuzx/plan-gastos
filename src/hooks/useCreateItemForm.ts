@@ -11,19 +11,22 @@ const initialExpense: DraftExpense = {
   // date: undefined
 }
 
-//! Validar que el gasto no supere el presupuesto actual
 // TODO: Añadir funcionalidad a editar y eliminar gastos
 
-export const useCreateItemForm = (onClose: () => void) => {
+export const useCreateItemForm = (
+  onClose: () => void
+  // expenseEdit: DraftExpense
+) => {
   const [expense, setExpense] = useState<DraftExpense>(initialExpense)
   const [errors, setErrors] = useState<Partial<DraftExpense>>({})
 
-  const { dispatch } = useBudget()
+  const { state, dispatch } = useBudget()
 
   const isFormValid = (): boolean => {
     return !!(
       expense.expenseName.trim() &&
       expense.amount > 0 &&
+      expense.amount <= state.budget &&
       expense.category &&
       expense.date
     )
@@ -31,13 +34,16 @@ export const useCreateItemForm = (onClose: () => void) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-
     const newExpense: Expense = {
       ...expense,
       id: uuidv4()
     }
 
-    dispatch({ type: 'add-expense', payload: { expense: newExpense } })
+    if (state.edittingId) {
+      dispatch({ type: 'update-expense', payload: { expense: newExpense } })
+    } else {
+      dispatch({ type: 'add-expense', payload: { expense: newExpense } })
+    }
 
     resetForm()
     onClose()
@@ -62,12 +68,17 @@ export const useCreateItemForm = (onClose: () => void) => {
     setErrors({})
   }
 
+  const validateExpense = () => {
+    return expense.amount > state.budget
+  }
+
   return {
     expense,
     errors,
     isFormValid,
     handleSubmit,
     updateExpense,
-    resetForm
+    resetForm,
+    validateExpense
   }
 }

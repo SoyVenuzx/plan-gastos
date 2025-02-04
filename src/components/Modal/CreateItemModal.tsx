@@ -11,7 +11,7 @@ import { categories } from '@/data/categories'
 import { cn } from '@/lib/utils'
 import { format } from 'date-fns'
 import { CalendarIcon } from 'lucide-react'
-import { type FC } from 'react'
+import { useEffect, type FC } from 'react'
 import { Calendar } from '../ui/calendar'
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
 import {
@@ -23,6 +23,7 @@ import {
 } from '../ui/select'
 import { InputContainer, InputLabel } from '../utils'
 import { useCreateItemForm } from '@/hooks/useCreateItemForm'
+import { useBudget } from '@/hooks/useBudget'
 
 interface CreateItemModalProps {
   isOpen: boolean
@@ -30,14 +31,34 @@ interface CreateItemModalProps {
 }
 
 const CreateItemModal: FC<CreateItemModalProps> = ({ isOpen, onClose }) => {
+  const { state } = useBudget()
+
+  useEffect(() => {
+    if (state.edittingId) {
+      const expense = state.expenses.find(e => e.id === state.edittingId)
+
+      if (expense) {
+        updateExpense('expenseName', expense.expenseName)
+        updateExpense('amount', expense.amount)
+        updateExpense('category', expense.category)
+        updateExpense('date', expense.date)
+      }
+    }
+  }, [state.edittingId])
+
   const {
     expense,
     errors,
     isFormValid,
     handleSubmit,
     updateExpense,
-    resetForm
+    resetForm,
+    validateExpense
   } = useCreateItemForm(onClose)
+
+  const errorMessage = validateExpense()
+    ? 'El gasto no puede superar el presupuesto actual'
+    : ''
 
   const handleClose = () => {
     resetForm()
@@ -74,11 +95,23 @@ const CreateItemModal: FC<CreateItemModalProps> = ({ isOpen, onClose }) => {
                 placeholder='Ingresa un monto'
                 onChange={e => updateExpense('amount', +e.target.value)}
                 className={cn('col-span-3', errors.amount && 'border-red-500')}
+                max={state.budget}
                 min={0}
               />
+
+              {errorMessage && (
+                <>
+                  <div className=''></div>
+                  <div className='flex w-[350px] mx-auto'>
+                    <p className='text-sm text-red-500'>{errorMessage}</p>
+                  </div>
+                </>
+              )}
             </InputContainer>
+
             <InputContainer>
               <InputLabel name='category'>Categoría</InputLabel>
+
               <Select
                 onValueChange={value => updateExpense('category', value)}
                 value={expense.category}
@@ -132,7 +165,7 @@ const CreateItemModal: FC<CreateItemModalProps> = ({ isOpen, onClose }) => {
 
           <DialogFooter>
             <Button disabled={!isFormValid()} type='submit'>
-              Crear
+              {state.edittingId ? 'Editar' : 'Agregar'}
             </Button>
           </DialogFooter>
         </form>

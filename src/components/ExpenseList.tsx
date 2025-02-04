@@ -7,7 +7,7 @@ import { Button } from './ui/button'
 import { Trash2 } from 'lucide-react'
 
 const ExpenseList: FC = () => {
-  const { state } = useBudget()
+  const { state, dispatch } = useBudget()
 
   return (
     <Card className='max-w-4xl mx-auto mt-12'>
@@ -40,11 +40,29 @@ const ExpenseList: FC = () => {
                       <p className='mr-4 text-lg font-semibold'>
                         ${expense.amount.toFixed(2)}
                       </p>
-                      <Button variant='outline' size='icon'>
+                      <Button
+                        variant='outline'
+                        size='icon'
+                        onClick={() =>
+                          dispatch({
+                            type: 'get-expense-by-id',
+                            payload: { id: expense.id }
+                          })
+                        }
+                      >
                         <Pencil className='w-4 h-4' />
                         <span className='sr-only'>Editar</span>
                       </Button>
-                      <Button variant='outline' size='icon'>
+                      <Button
+                        variant='outline'
+                        size='icon'
+                        onClick={() =>
+                          dispatch({
+                            type: 'remove-expense',
+                            payload: { id: expense.id }
+                          })
+                        }
+                      >
                         <Trash2 className='w-4 h-4' />
                         <span className='sr-only'>Eliminar</span>
                       </Button>

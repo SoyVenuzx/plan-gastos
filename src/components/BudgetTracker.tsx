@@ -9,13 +9,13 @@ import { RotateCcw } from 'lucide-react'
 
 export const BudgetTracker: FC = () => {
   const { state, dispatch } = useBudget()
-
   const { budget, spent } = state
 
   const available = budget - spent
+
   const percentage = useMemo(
     () => Math.round((spent / budget) * 100),
-    [state.budget, state.spent]
+    [state.budget, state.expenses, state.spent]
   )
 
   const values = { total: budget, spent, available }

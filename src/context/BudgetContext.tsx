@@ -4,7 +4,9 @@ import {
   BudgetState,
   initialState
 } from '@/reducers/budgetReducer'
+import { parseISO } from 'date-fns'
 import { createContext, Dispatch, useEffect, useReducer } from 'react'
+import { Expense } from '../types/index'
 
 type BudgetContextType = {
   state: BudgetState
@@ -13,10 +15,37 @@ type BudgetContextType = {
 
 const BudgetContext = createContext<BudgetContextType>({} as BudgetContextType)
 
-const BudgetProvider = ({ children }: { children: React.ReactNode }) => {
-  const [state, dispatch] = useReducer(budgetReducer, initialState)
+const init = (): BudgetState => {
+  const expenses = localStorage.getItem('expenses')
+  const amount = localStorage.getItem('amount')
 
-  useEffect(() => console.log(state), [state])
+  const budget = amount ? +amount : 0
+
+  const formattedExpenses = JSON.parse(expenses!)?.map((expense: Expense) => ({
+    ...expense,
+    date: parseISO(String(expense.date))
+  }))
+
+  return expenses
+    ? { ...initialState, expenses: formattedExpenses, budget }
+    : initialState
+}
+
+const BudgetProvider = ({ children }: { children: React.ReactNode }) => {
+  const [state, dispatch] = useReducer(budgetReducer, init())
+
+  useEffect(() => {
+    if (state.expenses.length === 0) return
+
+    const totalSpent = state.expenses.reduce(
+      (acc, curr) => acc + curr.amount,
+      0
+    )
+
+    dispatch({ type: 'update-spent', payload: { spent: totalSpent } })
+    localStorage.setItem('expenses', JSON.stringify(state.expenses))
+    localStorage.setItem('amount', JSON.stringify(state.budget))
+  }, [state?.expenses])
 
   return (
     <BudgetContext.Provider value={{ state, dispatch }}>

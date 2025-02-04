@@ -12,7 +12,10 @@ export const App = () => {
     dispatch
   } = useBudget()
 
-  const modalToggle = () => dispatch({ type: 'show-modal' })
+  const modalToggle = () => {
+    dispatch({ type: 'get-expense-by-id', payload: { id: '' } })
+    dispatch({ type: 'show-modal' })
+  }
 
   return (
     <div className='min-h-screen bg-gray-50'>
@@ -25,7 +28,7 @@ export const App = () => {
           <>
             <BudgetTracker />
 
-            {expenses.length && <ExpenseList />}
+            {expenses.length > 0 && <ExpenseList />}
             {budget !== spent && <FloatingActionButton onClick={modalToggle} />}
           </>
         )}
