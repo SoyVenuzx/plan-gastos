@@ -1,5 +1,4 @@
 import { Expense } from '@/types'
-import { useMemo } from 'react'
 
 export type BudgetState = {
   expenses: Expense[]
