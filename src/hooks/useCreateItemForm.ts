@@ -11,8 +11,6 @@ const initialExpense: DraftExpense = {
   // date: undefined
 }
 
-// TODO: Añadir funcionalidad a editar y eliminar gastos
-
 export const useCreateItemForm = (
   onClose: () => void
   // expenseEdit: DraftExpense

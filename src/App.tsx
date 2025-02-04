@@ -8,13 +8,21 @@ import ExpenseList from './components/ExpenseList'
 
 export const App = () => {
   const {
-    state: { budget, showModal, spent, expenses },
+    state: { budget, showModal, spent, expenses, edittingId },
     dispatch
   } = useBudget()
 
   const modalToggle = () => {
     dispatch({ type: 'get-expense-by-id', payload: { id: '' } })
     dispatch({ type: 'show-modal' })
+  }
+
+  const openModal = () => {
+    if (!edittingId && showModal === false) {
+      dispatch({ type: 'show-modal' })
+    }
+
+    return false
   }
 
   return (
@@ -29,7 +37,7 @@ export const App = () => {
             <BudgetTracker />
 
             {expenses.length > 0 && <ExpenseList />}
-            {budget !== spent && <FloatingActionButton onClick={modalToggle} />}
+            {budget !== spent && <FloatingActionButton onClick={openModal} />}
           </>
         )}
         {/* </div> */}
