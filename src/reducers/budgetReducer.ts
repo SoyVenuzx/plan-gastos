@@ -65,18 +65,6 @@ export const budgetReducer = (
       return { ...state, showModal: !state.showModal }
 
     case 'remove-expense':
-      console.log({removeid: action.payload.id})
-
-      if (state.expenses.length === 1) {
-        localStorage.setItem('expenses', JSON.stringify([]))
-
-        return {
-          ...state,
-          expenses: [],
-          spent: 0
-        } 
-      }
-
       return {
         ...state,
         expenses:  state.expenses.filter(

@@ -35,19 +35,15 @@ const BudgetProvider = ({ children }: { children: React.ReactNode }) => {
   const [state, dispatch] = useReducer(budgetReducer, init())
 
   useEffect(() => {
-    if (state.expenses.length === 0) return
-
-    localStorage.setItem('expenses', JSON.stringify(state.expenses))
-    localStorage.setItem('amount', JSON.stringify(state.budget))
-
     const totalSpent = state.expenses.reduce(
       (acc, curr) => acc + curr.amount,
       0
     )
 
-    console.log({ state })
-
     dispatch({ type: 'update-spent', payload: { spent: totalSpent } })
+
+    localStorage.setItem('expenses', JSON.stringify(state.expenses))
+    localStorage.setItem('amount', JSON.stringify(state.budget))
   }, [state.expenses])
 
   return (
