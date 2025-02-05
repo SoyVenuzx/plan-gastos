@@ -15,7 +15,7 @@ export const BudgetTracker: FC = () => {
 
   const percentage = useMemo(
     () => Math.round((spent / budget) * 100),
-    [state.budget, state.expenses, state.spent]
+    [state.expenses, state.spent]
   )
 
   const values = { total: budget, spent, available }
