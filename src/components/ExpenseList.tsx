@@ -1,6 +1,6 @@
 import { Card, CardContent, CardTitle } from '@/components/ui/card'
 import { categories } from '@/data/categories'
-import { FC } from 'react'
+import { FC, useMemo } from 'react'
 import { useBudget } from '@/hooks/useBudget'
 import { Pencil } from 'lucide-react'
 import { Button } from './ui/button'
@@ -9,8 +9,14 @@ import { Trash2 } from 'lucide-react'
 const ExpenseList: FC = () => {
   const { state, dispatch } = useBudget()
 
+  const filteredItems = useMemo(() => {
+    if (!state.filter || state.filter === 'all') return state.expenses
+
+    return state.expenses.filter(item => item.category === state.filter)
+  }, [state.expenses, state.filter])
+
   return (
-    <Card className='max-w-4xl mx-auto mt-12'>
+    <Card className='max-w-4xl mx-auto mt-10'>
       <div className='flex items-center justify-center p-2 mt-4'>
         <CardTitle className='text-2xl font-bold text-center text-primary'>
           Gastos Realizados
@@ -18,7 +24,7 @@ const ExpenseList: FC = () => {
       </div>
       <div className='px-5'>
         <div className='w-full mt-12 mb-10 overflow-y-auto border rounded-md'>
-          {state.expenses.map(expense => {
+          {filteredItems.map(expense => {
             const category = categories.find(c => c.id === expense.category)
             if (!category) return null
 
@@ -72,6 +78,13 @@ const ExpenseList: FC = () => {
               </div>
             )
           })}
+          {filteredItems.length === 0 && (
+            <div className='flex items-center justify-center h-40'>
+              <p className='text-lg text-muted-foreground'>
+                No hay gastos para mostrar
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </Card>
