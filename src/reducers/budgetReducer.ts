@@ -6,6 +6,7 @@ export type BudgetState = {
   spent: number
   showModal: boolean
   edittingId: Expense['id']
+  filter: string
 }
 
 export const initialState: BudgetState = {
@@ -13,7 +14,8 @@ export const initialState: BudgetState = {
   budget: 0,
   spent: 0,
   showModal: false,
-  edittingId: ''
+  edittingId: '',
+  filter: ''
 }
 
 export type BudgetActions =
@@ -46,6 +48,9 @@ export type BudgetActions =
   | {
       type: 'update-expense'
       payload: { expense: Expense }
+    } | {
+      type: 'filter-expenses'
+      payload: { filter: string }
     }
 
 export const budgetReducer = (
@@ -60,9 +65,21 @@ export const budgetReducer = (
       return { ...state, showModal: !state.showModal }
 
     case 'remove-expense':
+      console.log({removeid: action.payload.id})
+
+      if (state.expenses.length === 1) {
+        localStorage.setItem('expenses', JSON.stringify([]))
+
+        return {
+          ...state,
+          expenses: [],
+          spent: 0
+        } 
+      }
+
       return {
         ...state,
-        expenses: state.expenses.filter(
+        expenses:  state.expenses.filter(
           expense => expense.id !== action.payload.id
         )
       }
@@ -97,6 +114,12 @@ export const budgetReducer = (
         ...state,
         expenses: updatedExpenses
       }
+
+      case 'filter-expenses':
+        return {
+          ...state,
+          filter: action.payload.filter
+        }
 
     default:
       return state

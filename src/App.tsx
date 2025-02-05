@@ -5,6 +5,7 @@ import { useBudget } from './hooks/useBudget'
 import FloatingActionButton from './components/Modal/FloatingActionButton'
 import CreateItemModal from './components/Modal/CreateItemModal'
 import ExpenseList from './components/ExpenseList'
+import { FilterExpense } from './components/FilterExpense'
 
 export const App = () => {
   const {
@@ -36,7 +37,12 @@ export const App = () => {
           <>
             <BudgetTracker />
 
-            {expenses.length > 0 && <ExpenseList />}
+            {expenses.length > 0 && (
+              <>
+                <FilterExpense />
+                <ExpenseList />
+              </>
+            )}
             {budget !== spent && <FloatingActionButton onClick={openModal} />}
           </>
         )}
